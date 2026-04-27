@@ -16,6 +16,14 @@ app.db = router.db;
 
 const validationMiddleware = createValidationMiddleware({ router, sendError });
 
+function isDuplicateIdError(error) {
+  return (
+    error instanceof Error &&
+    typeof error.message === "string" &&
+    error.message.includes("Insert failed, duplicate id")
+  );
+}
+
 const middlewares = jsonServer.defaults({
   static: publicDir,
 });
@@ -68,6 +76,24 @@ app.use((req, res) => {
 });
 
 app.use((err, _req, res, _next) => {
+  if (isDuplicateIdError(err)) {
+    sendError(
+      res,
+      409,
+      "RESOURCE_CONFLICT",
+      "Request conflicts with existing data.",
+      [
+        {
+          field: "id",
+          message:
+            "Create requests must not include an id. The server assigns ids automatically.",
+          code: "conflict",
+        },
+      ],
+    );
+    return;
+  }
+
   console.error(err);
   sendError(
     res,

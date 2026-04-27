@@ -171,6 +171,44 @@ function createValidationMiddleware({ router, sendError }) {
     );
   }
 
+  function getReservationById(reservationId) {
+    return (
+      router.db
+        .get("reservations")
+        .find({ id: Number(reservationId) })
+        .value() ?? null
+    );
+  }
+
+  function normalizeCalendarDate(value) {
+    if (!isValidDateString(value)) {
+      return null;
+    }
+
+    return new Date(value).toISOString().slice(0, 10);
+  }
+
+  function reservationConflictExists(table, date, currentId) {
+    const normalizedTable = String(Number(table));
+    const normalizedDate = normalizeCalendarDate(date);
+
+    if (!isPositiveIntegerLike(table) || !normalizedDate) {
+      return false;
+    }
+
+    return (
+      router.db
+        .get("reservations")
+        .find(
+          (item) =>
+            String(Number(item.table)) === normalizedTable &&
+            normalizeCalendarDate(item.date) === normalizedDate &&
+            item.id !== currentId,
+        )
+        .value() != null
+    );
+  }
+
   const validators = {
     events(body, mode) {
       const errors = [];
@@ -251,7 +289,7 @@ function createValidationMiddleware({ router, sendError }) {
 
       return errors;
     },
-    reservations(body, mode) {
+    reservations(body, mode, resourceId) {
       const errors = [];
 
       validateRequiredString(body, "name", "name", errors, mode);
@@ -260,6 +298,31 @@ function createValidationMiddleware({ router, sendError }) {
       validateRequiredPositiveInteger(body, "guests", "guests", errors, mode);
       validateRequiredDate(body, "date", "date", errors, mode);
       validateRequiredString(body, "phone", "phone", errors, mode);
+
+      const existingReservation =
+        mode === "update" && resourceId != null
+          ? getReservationById(resourceId)
+          : null;
+      const effectiveTable = hasOwn(body, "table")
+        ? body.table
+        : existingReservation?.table;
+      const effectiveDate = hasOwn(body, "date")
+        ? body.date
+        : existingReservation?.date;
+      const shouldCheckConflict =
+        mode === "create" || hasOwn(body, "table") || hasOwn(body, "date");
+
+      if (
+        shouldCheckConflict &&
+        reservationConflictExists(effectiveTable, effectiveDate, resourceId)
+      ) {
+        addError(
+          errors,
+          "table",
+          "This table is already reserved for the selected date.",
+          "conflict",
+        );
+      }
 
       return errors;
     },
@@ -296,6 +359,11 @@ function createValidationMiddleware({ router, sendError }) {
         "Request body must be a JSON object.",
       );
       return;
+    }
+
+    if (req.method === "POST" && hasOwn(req.body, "id")) {
+      // Create requests should never trust client-supplied ids.
+      delete req.body.id;
     }
 
     const { resource, id } = parseResourceSegments(req.path);
