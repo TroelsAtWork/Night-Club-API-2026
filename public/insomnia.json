@@ -440,7 +440,7 @@
       "created": 1647281154664,
       "url": "{{ _.BASE_URL }}/reservations",
       "name": "Reservations",
-      "description": "Creates a reservation. Required fields: `name`, `email`, `table`, `guests`, `date` and `phone`.",
+      "description": "Creates a reservation. Required fields: `name`, `email`, `table`, `guests`, `date` and `phone`. The selected table must exist, have enough seats for the guest count and not already be reserved on the same calendar date.",
       "method": "POST",
       "body": {
         "mimeType": "application/json",

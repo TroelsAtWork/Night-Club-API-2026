@@ -101,6 +101,9 @@ Validation errors return a consistent JSON structure:
 ```
 
 Newsletter signups also reject duplicate email addresses with HTTP `409 Conflict`.
+Reservation requests also reject unknown table numbers, guest counts above the
+selected table's capacity, and duplicate reservations for the same table on the
+same calendar date.
 
 Common status codes:
 
@@ -108,7 +111,7 @@ Common status codes:
 - `201 Created` for successful `POST` requests
 - `400 Bad Request` with `VALIDATION_ERROR` for invalid payloads
 - `404 Not Found` with `NOT_FOUND` for unknown routes
-- `409 Conflict` with `RESOURCE_CONFLICT` for duplicate newsletter signups
+- `409 Conflict` with `RESOURCE_CONFLICT` for duplicate newsletter signups and reservation conflicts
 - `500 Internal Server Error` with `INTERNAL_SERVER_ERROR` for unexpected server failures
 
 ## Documentation

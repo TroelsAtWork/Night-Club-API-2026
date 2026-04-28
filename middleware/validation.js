@@ -24,6 +24,24 @@ function createValidationMiddleware({ router, sendError }) {
     return Number.isInteger(parsedValue) && parsedValue > 0;
   }
 
+  const tableCapacities = Object.freeze({
+    1: 4,
+    2: 4,
+    3: 6,
+    4: 4,
+    5: 8,
+    6: 4,
+    7: 4,
+    8: 6,
+    9: 4,
+    10: 8,
+    11: 4,
+    12: 4,
+    13: 6,
+    14: 4,
+    15: 8,
+  });
+
   function isValidEmail(value) {
     return (
       typeof value === "string" &&
@@ -109,6 +127,14 @@ function createValidationMiddleware({ router, sendError }) {
     if (!isPositiveIntegerLike(body[field])) {
       addError(errors, field, `${label} must be a positive whole number.`);
     }
+  }
+
+  function getTableCapacity(table) {
+    if (!isPositiveIntegerLike(table)) {
+      return undefined;
+    }
+
+    return tableCapacities[Number(table)];
   }
 
   function validateRequiredAsset(body, field, label, errors, mode) {
@@ -306,9 +332,32 @@ function createValidationMiddleware({ router, sendError }) {
       const effectiveTable = hasOwn(body, "table")
         ? body.table
         : existingReservation?.table;
+      const effectiveGuests = hasOwn(body, "guests")
+        ? body.guests
+        : existingReservation?.guests;
       const effectiveDate = hasOwn(body, "date")
         ? body.date
         : existingReservation?.date;
+      const shouldCheckCapacity =
+        mode === "create" || hasOwn(body, "table") || hasOwn(body, "guests");
+
+      if (shouldCheckCapacity && isPositiveIntegerLike(effectiveTable)) {
+        const capacity = getTableCapacity(effectiveTable);
+
+        if (capacity === undefined) {
+          addError(errors, "table", "table must reference an available table.");
+        } else if (
+          isPositiveIntegerLike(effectiveGuests) &&
+          Number(effectiveGuests) > capacity
+        ) {
+          addError(
+            errors,
+            "guests",
+            `guests must not exceed table ${Number(effectiveTable)} capacity of ${capacity}.`,
+          );
+        }
+      }
+
       const shouldCheckConflict =
         mode === "create" || hasOwn(body, "table") || hasOwn(body, "date");
 
