@@ -37,12 +37,13 @@ Core read endpoints:
 - `GET /events`
 - `GET /events/:id`
 - `GET /events/:slug`
-- `GET /blogposts`
-- `GET /blogposts/:id`
-- `GET /blogposts/:id?_embed=comments`
-- `GET /comments?blogpostId=:id`
+- `GET /events/:id?_embed=comments`
+- `GET /comments`
+- `GET /comments?eventId=:id`
 - `GET /gallery`
 - `GET /testimonials`
+- `GET /reservations`
+- `GET /reservations?eventId=:id`
 
 Core write endpoints:
 
@@ -105,6 +106,32 @@ points to a `1170x500` hero image for event detail pages.
 Event and reservation date-time values use ISO 8601 with an explicit Danish
 local offset, for example `+02:00` during Danish summer time.
 
+Event comments are stored in the `comments` collection and reference events by
+`eventId`. To show comments on an event detail page, fetch the event and then
+fetch its comments with `GET /comments?eventId=1`. A numeric event request can
+also embed comments with `GET /events/1?_embed=comments`.
+
+```json
+{
+  "id": 1,
+  "eventId": 1,
+  "name": "Robert Downey Junior",
+  "content": "Best club ever!",
+  "date": "2026-05-09T22:15:00+02:00"
+}
+```
+
+To create a new event comment, post to `POST /comments`:
+
+```json
+{
+  "eventId": 1,
+  "name": "Robert Downey Junior",
+  "content": "What an amazing evening!",
+  "date": "2026-05-09T22:15:00+02:00"
+}
+```
+
 ```json
 {
   "name": "Robert Downey Jr",
@@ -117,11 +144,21 @@ local offset, for example `+02:00` during Danish summer time.
 }
 ```
 
+## Pagination And Filtering
+
+Collection endpoints support standard `json-server` query parameters for
+pagination and filtering. `_page` is one-based, and `_limit` controls how many
+items are returned per page.
+
+```txt
+GET /events?_page=2&_limit=3
+GET /comments?eventId=1&_page=1&_limit=5
+```
+
 ## Validation And Errors
 
 The server now validates write requests for these collections:
 
-- `blogposts`
 - `comments`
 - `gallery`
 - `testimonials`
@@ -148,10 +185,13 @@ Validation errors return a consistent JSON structure:
 ```
 
 Newsletter signups also reject duplicate email addresses with HTTP `409 Conflict`.
+Comment requests require an `eventId` that references an existing event.
 Reservation requests also reject unknown table numbers, guest counts above the
 selected table's capacity, and duplicate reservations for the same table on the
 same calendar date. If a reservation includes `eventId`, the event must exist
 and the reservation `date` must be on the same calendar date as that event.
+The frontend can use `GET /reservations` or `GET /reservations?eventId=1` to
+derive which tables are already reserved before submitting a new reservation.
 
 Common status codes:
 
