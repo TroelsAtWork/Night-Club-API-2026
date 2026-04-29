@@ -206,6 +206,19 @@ function createValidationMiddleware({ router, sendError }) {
     );
   }
 
+  function getEventById(eventId) {
+    if (!isPositiveIntegerLike(eventId)) {
+      return null;
+    }
+
+    return (
+      router.db
+        .get("events")
+        .find({ id: Number(eventId) })
+        .value() ?? null
+    );
+  }
+
   function normalizeCalendarDate(value) {
     if (!isValidDateString(value)) {
       return null;
@@ -236,17 +249,6 @@ function createValidationMiddleware({ router, sendError }) {
   }
 
   const validators = {
-    events(body, mode) {
-      const errors = [];
-
-      validateRequiredString(body, "title", "title", errors, mode);
-      validateRequiredString(body, "description", "description", errors, mode);
-      validateRequiredDate(body, "date", "date", errors, mode);
-      validateRequiredString(body, "location", "location", errors, mode);
-      validateRequiredAsset(body, "asset", "asset", errors, mode);
-
-      return errors;
-    },
     blogposts(body, mode) {
       const errors = [];
 
@@ -338,6 +340,9 @@ function createValidationMiddleware({ router, sendError }) {
       const effectiveDate = hasOwn(body, "date")
         ? body.date
         : existingReservation?.date;
+      const effectiveEventId = hasOwn(body, "eventId")
+        ? body.eventId
+        : existingReservation?.eventId;
       const shouldCheckCapacity =
         mode === "create" || hasOwn(body, "table") || hasOwn(body, "guests");
 
@@ -355,6 +360,45 @@ function createValidationMiddleware({ router, sendError }) {
             "guests",
             `guests must not exceed table ${Number(effectiveTable)} capacity of ${capacity}.`,
           );
+        }
+      }
+
+      const hasEventId =
+        effectiveEventId !== undefined &&
+        effectiveEventId !== null &&
+        effectiveEventId !== "";
+      const shouldCheckEvent =
+        hasEventId &&
+        (mode === "create" ||
+          hasOwn(body, "eventId") ||
+          hasOwn(body, "date"));
+
+      if (shouldCheckEvent) {
+        if (!isPositiveIntegerLike(effectiveEventId)) {
+          addError(
+            errors,
+            "eventId",
+            "eventId must reference an existing event.",
+          );
+        } else {
+          const event = getEventById(effectiveEventId);
+
+          if (!event) {
+            addError(
+              errors,
+              "eventId",
+              "eventId must reference an existing event.",
+            );
+          } else if (
+            normalizeCalendarDate(effectiveDate) !==
+            normalizeCalendarDate(event.date)
+          ) {
+            addError(
+              errors,
+              "date",
+              "date must be on the same calendar date as the selected event.",
+            );
+          }
         }
       }
 

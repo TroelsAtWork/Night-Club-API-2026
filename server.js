@@ -38,6 +38,48 @@ app.get("/health", (_req, res) => {
   });
 });
 
+app.use("/events", (req, res, next) => {
+  res.set("Allow", "GET, HEAD, OPTIONS");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).end();
+    return;
+  }
+
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    sendError(
+      res,
+      405,
+      "METHOD_NOT_ALLOWED",
+      "Events are read-only. Use GET to list or retrieve events.",
+    );
+    return;
+  }
+
+  next();
+});
+
+app.get("/events/:slug", (req, res, next) => {
+  if (/^\d+$/.test(req.params.slug)) {
+    next();
+    return;
+  }
+
+  const event = router.db.get("events").find({ slug: req.params.slug }).value();
+
+  if (!event) {
+    sendError(
+      res,
+      404,
+      "NOT_FOUND",
+      `No event matches slug ${req.params.slug}.`,
+    );
+    return;
+  }
+
+  res.status(200).json(event);
+});
+
 app.use(jsonServer.bodyParser);
 app.use(validationMiddleware);
 app.use((req, res, next) => {
