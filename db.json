@@ -17,11 +17,7 @@
       },
       "location": "Center Stage",
       "category": "House",
-      "lineup": [
-        "Mika Vale",
-        "Nora Lumen",
-        "Live percussion by Elias B"
-      ],
+      "lineup": ["Mika Vale", "Nora Lumen", "Live percussion by Elias B"],
       "schedule": [
         {
           "time": "21:00",
@@ -57,11 +53,7 @@
       },
       "location": "Center Stage",
       "category": "Retro",
-      "lineup": [
-        "DJ Vester",
-        "Sofie Selects",
-        "MC Jay Monroe"
-      ],
+      "lineup": ["DJ Vester", "Sofie Selects", "MC Jay Monroe"],
       "schedule": [
         {
           "time": "21:00",
@@ -97,11 +89,7 @@
       },
       "location": "Center Stage",
       "category": "Bass",
-      "lineup": [
-        "KATOX",
-        "Runa Bass",
-        "Hosted by MC North"
-      ],
+      "lineup": ["KATOX", "Runa Bass", "Hosted by MC North"],
       "schedule": [
         {
           "time": "21:30",
@@ -137,11 +125,7 @@
       },
       "location": "Basement Room",
       "category": "Techno",
-      "lineup": [
-        "Aksel Ravn",
-        "Mira Kold",
-        "Noir Transit"
-      ],
+      "lineup": ["Aksel Ravn", "Mira Kold", "Noir Transit"],
       "schedule": [
         {
           "time": "21:30",
@@ -177,11 +161,7 @@
       },
       "location": "Center Stage",
       "category": "Disco",
-      "lineup": [
-        "Clara Nova",
-        "The Saturday Edit",
-        "Guest vocalist: Lina Ray"
-      ],
+      "lineup": ["Clara Nova", "The Saturday Edit", "Guest vocalist: Lina Ray"],
       "schedule": [
         {
           "time": "21:00",
@@ -217,11 +197,7 @@
       },
       "location": "Center Stage",
       "category": "House",
-      "lineup": [
-        "Jonas Field",
-        "Maja Bloom",
-        "Late set by PALM"
-      ],
+      "lineup": ["Jonas Field", "Maja Bloom", "Late set by PALM"],
       "schedule": [
         {
           "time": "21:00",
@@ -257,11 +233,7 @@
       },
       "location": "Center Stage",
       "category": "Latin",
-      "lineup": [
-        "Isabella Cruz",
-        "DJ Mateo",
-        "Percussion by Nico Vega"
-      ],
+      "lineup": ["Isabella Cruz", "DJ Mateo", "Percussion by Nico Vega"],
       "schedule": [
         {
           "time": "21:00",
@@ -297,11 +269,7 @@
       },
       "location": "Velvet Lounge",
       "category": "R&B",
-      "lineup": [
-        "Nia Vale",
-        "Oscar Wav",
-        "Late set by SLOWCUT"
-      ],
+      "lineup": ["Nia Vale", "Oscar Wav", "Late set by SLOWCUT"],
       "schedule": [
         {
           "time": "21:00",
@@ -318,7 +286,7 @@
       ],
       "price": "125 DKK",
       "ageLimit": "20+",
-      "isFeatured": true
+      "isFeatured": false
     }
   ],
   "comments": [
