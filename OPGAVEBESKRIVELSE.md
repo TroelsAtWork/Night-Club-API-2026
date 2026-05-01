@@ -79,7 +79,7 @@ Designet findes i en Figma-fil under ressourcer på ItsLearning. Der er udlevere
 
 På den baggrund vurderes gruppens evne til at træffe professionelle og velovervejede beslutninger om, hvordan mangler håndteres. Det kan eksempelvis være valg af alternative materialer, brug af billeder fra API'et eller implementering af logo/ikoner via et ikonbibliotek, hvis det giver en mere fleksibel løsning.
 
-I må gerne udfordre designet med mindre reparationer eller et brush-up, hvis det styrker UI-konventioner, best practice og brugervenlighed. Det skal ikke være et redesign; ellers skal løsningen følge designet.
+I må gerne udfordre designet og lave mindre justeringer, hvis det styrker UI-konventioner, best practice og brugervenlighed. Der er dog ikke tale om et redesign, og løsningen skal som udgangspunkt følge det eksisterende design.
 
 ## Generelle Krav
 
